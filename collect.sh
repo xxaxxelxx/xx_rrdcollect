@@ -7,8 +7,15 @@ test -z $RRD_LOOP && exit;
 test -z $CUSTOMER && exit;
 
 while true; do
-    curl -o /dev/null --connect-timeout 3 -s "http://$LOADBALANCER_ADDR/listeners.php?mnt=$CUSTOMER" 2>&1 > /dev/null
+    OIFS=$IFS; IFS=$'\n'; A_MOUNTPOINTS=($(curl --connect-timeout 3 -s "http://$LB_HOST/listmountpoints.php?mnt=$CUSTOMER")); IFS=$OIFS
+    for C_MNT in ${A_MOUNTPOINTS[@]}; do
+	C_VALUE=$(curl --connect-timeout 3 -s "http://$LB_HOST/listeners.php?mnt=$CUSTOMER")
+	echo "$C_MNT is $C_VALUE"
+    done
     sleep $RRD_LOOP
 done
 
 exit
+
+
+
