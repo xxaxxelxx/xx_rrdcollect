@@ -17,10 +17,10 @@ while true; do
 	    rrdtool create $RRDFILE \
 	    --step $RRD_LOOP \
 	    DS:$C_MNT:GAUGE:$(($RRD_LOOP*2)):U:U \
-	    RRA:MAX:0.5:1:$(( $((3600 / $RRD_LOOP )) * 24 )) \
-	    RRA:MAX:0.5:4:$(( $(( $(( 3600 / $(( $RRD_LOOP * 4 ))  )) * 24 )) * 7 )) \
-	    RRA:MAX:0.5:12:$(( $(( $(( 3600 / $(( $RRD_LOOP * 12 ))  )) * 24 )) * 31 )) \
-	    RRA:MAX:0.5:100:$(( $(( $(( 3600 / $(( $RRD_LOOP * 100 ))  )) * 24 )) * 366 ))
+	    RRA:MAX:0.5:1:$(( $((1 * 24 * 60 * 60)) / $(( $RRD_LOOP * 1 )) )) \
+	    RRA:MAX:0.5:4:$(( $((7 * 24 * 60 * 60)) / $(( $RRD_LOOP * 4 )) )) \
+	    RRA:MAX:0.5:12:$(( $((31 * 24 * 60 * 60)) / $(( $RRD_LOOP * 12 )) )) \
+	    RRA:MAX:0.5:100:$(( $((366 * 24 * 60 * 60)) / $(( $RRD_LOOP * 100 )) ))
 	)
 	rrdtool update $RRDFILE N:$C_VALUE
     done
