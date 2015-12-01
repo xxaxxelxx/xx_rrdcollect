@@ -18,7 +18,7 @@ while true; do
 	    ITEMS_WEEK=$(( $((8 * 24 * 60 * 60)) / $(( $RRD_LOOP * 4 )) ))
 	    ITEMS_MONTH=$(( $((32 * 24 * 60 * 60)) / $(( $RRD_LOOP * 12 )) ))
 	    ITEMS_YEAR=$(( $((366 * 24 * 60 * 60)) / $(( $RRD_LOOP * 100 )) ))
-	    echo "$ITEMS_DAY $ITEMS_WEEK $ITEMS_MONTH $ITEMS_YEAR"
+#	    echo "$ITEMS_DAY $ITEMS_WEEK $ITEMS_MONTH $ITEMS_YEAR"
 	    rrdtool create $RRDFILE \
 	    --step $RRD_LOOP \
 	    DS:$C_MNT:GAUGE:$(($RRD_LOOP*2)):U:U \
