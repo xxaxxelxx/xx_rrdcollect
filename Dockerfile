@@ -20,6 +20,8 @@ RUN apt-get clean
 COPY *.sh /
 RUN chmod 700 /*.sh
 
+ENV RRD_LOOP=300
+
 COPY entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT [ "/entrypoint.sh" ]
