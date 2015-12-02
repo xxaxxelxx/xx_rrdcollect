@@ -16,7 +16,7 @@ if [ "x$CUSTOMER" == "xadmin" ]; then
 	    C_BWLOAD=${A_MACHINE_DATA[2]}
 	    C_LOAD=${A_MACHINE_DATA[3]}
 	    RRDFILE="/customer/$CUSTOMER/_$C_IP.rrd"
-	    echo "$C_IP $C_BW $C_BWLOAD $C_LOAD" >> $RRD_FILE
+	    echo "$C_IP $C_BW $C_BWLOAD $C_LOAD" >> $RRDFILE
 #	    C_MNT=$(echo $MNT | sed 's|^/||' | sed 's|\.|\_|g')
 #	    test -f $RRDFILE || (
 #		ITEMS_DAY=$(( $((2 * 24 * 60 * 60)) / $(( $RRD_LOOP * 1 )) ))
