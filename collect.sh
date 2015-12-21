@@ -8,7 +8,7 @@ test -z $CUSTOMER && exit;
 
 if [ "x$CUSTOMER" == "xadmin" ]; then
     while true; do
-	OIFS=$IFS; IFS=$'\n'; A_MACHINES=($(curl --connect-timeout 3 -s "http://$LB_HOST/listmachines.php")); IFS=$OIFS
+	OIFS=$IFS; IFS=$'\n'; A_MACHINES=($(curl --connect-timeout 3 --max-time 5 -s "http://$LB_HOST/listmachines.php")); IFS=$OIFS
 	for MACHINE in ${A_MACHINES[@]}; do
 	    OIFS=$IFS; IFS='|'; A_MACHINE_DATA=($(echo "$MACHINE")); IFS=$OIFS
 	    IP=${A_MACHINE_DATA[0]}
@@ -38,7 +38,7 @@ if [ "x$CUSTOMER" == "xadmin" ]; then
     done
 else
     while true; do
-	OIFS=$IFS; IFS=$'\n'; A_MOUNTPOINTS=($(curl --connect-timeout 3 -s "http://$LB_HOST/listmountpoints.php?mnt=$CUSTOMER")); IFS=$OIFS
+	OIFS=$IFS; IFS=$'\n'; A_MOUNTPOINTS=($(curl --connect-timeout 3 --max-time 5 -s "http://$LB_HOST/listmountpoints.php?mnt=$CUSTOMER")); IFS=$OIFS
 	for MNT in ${A_MOUNTPOINTS[@]}; do
 	    STRIPPED_MNT=$(echo $MNT | sed 's|^/||')
 	    C_VALUE=$(curl --connect-timeout 3 -s "http://$LB_HOST/listeners.php?mnt=$STRIPPED_MNT")
