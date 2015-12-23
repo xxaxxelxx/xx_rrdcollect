@@ -8,7 +8,7 @@ test -z $CUSTOMER && exit;
 
 if [ "x$CUSTOMER" == "xadmin" ]; then
     while true; do
-	OIFS=$IFS; IFS=$'\n'; A_MACHINES=($(curl --connect-timeout 20 --max-time 30 -s "http://$LB_HOST/listmachines.php")); IFS=$OIFS
+	OIFS=$IFS; IFS=$'\n'; A_MACHINES=($(curl --connect-timeout 10 --max-time 20 -s "http://$LB_HOST/listmachines.php")); IFS=$OIFS
 	for MACHINE in ${A_MACHINES[@]}; do
 	    OIFS=$IFS; IFS='|'; A_MACHINE_DATA=($(echo "$MACHINE")); IFS=$OIFS
 	    IP=${A_MACHINE_DATA[0]}
@@ -38,7 +38,7 @@ if [ "x$CUSTOMER" == "xadmin" ]; then
     done
 else
     while true; do
-	OIFS=$IFS; IFS=$'\n'; A_MOUNTPOINTS=($(curl --connect-timeout 20 --max-time 30 -s "http://$LB_HOST/listmountpoints.php?mnt=$CUSTOMER")); IFS=$OIFS
+	OIFS=$IFS; IFS=$'\n'; A_MOUNTPOINTS=($(curl --connect-timeout 10 --max-time 20 -s "http://$LB_HOST/listmountpoints.php?mnt=$CUSTOMER")); IFS=$OIFS
 	for MNT in ${A_MOUNTPOINTS[@]}; do
 	    STRIPPED_MNT=$(echo $MNT | sed 's|^/||')
 	    C_VALUE=$(curl --connect-timeout 3 -s "http://$LB_HOST/listeners.php?mnt=$STRIPPED_MNT")
@@ -51,7 +51,7 @@ else
 		ITEMS_YEAR=$(( $((366 * 24 * 60 * 60)) / $(( $RRD_LOOP * 100 )) ))
 		rrdtool create $RRDFILE \
 		--step $RRD_LOOP \
-		DS:${C_MNT:0:19}:GAUGE:$(($RRD_LOOP*2)):U:U \
+		DS:$C_MNT:GAUGE:$(($RRD_LOOP*2)):U:U \
 		RRA:MAX:0.5:1:$ITEMS_DAY \
 		RRA:MAX:0.5:4:$ITEMS_WEEK \
 		RRA:MAX:0.5:12:$ITEMS_MONTH \
