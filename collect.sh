@@ -40,12 +40,12 @@ else
     while true; do
 	OIFS=$IFS; IFS=$'\n'; A_MOUNTPOINTS=($(curl --connect-timeout 10 --max-time 10 -s "http://$LB_HOST/listmountpointlisteners.php?mnt=$CUSTOMER")); IFS=$OIFS
 	for LISTMNT in ${A_MOUNTPOINTS[@]}; do
-	    OIFS=$IFS; IFS=$'@'; A_ELEM =($(echo "$LISTMNT")); IFS=$OIFS
+	    OIFS=$IFS; IFS=$'@'; A_ELEM=($(echo "$LISTMNT")); IFS=$OIFS
 	    LIST=${A_ELEM[0]}
 	    MNT=${A_ELEM[1]}
 	    STRIPPED_MNT=$(echo $MNT | sed 's|^/||')
 #	    C_VALUE=$(curl --connect-timeout 3 -s "http://$LB_HOST/listeners.php?mnt=$STRIPPED_MNT")
-	    C_VALUE=$LIST;
+	    C_VALUE=$LIST
 	    C_MNT=$(echo $MNT | sed 's|^/||' | sed 's|\.|\_|g')
 	    RRDFILE="/customer/$CUSTOMER/_$C_MNT.rrd"
 	    test -f $RRDFILE || (

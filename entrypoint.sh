@@ -7,8 +7,8 @@ LB_HOST="$(cat /etc/hosts | grep -iw ${LINKED_CONTAINER} | awk '{print $1}')"
 
 
 
-./collect.sh $LB_HOST $RRD_LOOP $CUSTOMER
+#./collect.sh $LB_HOST $RRD_LOOP $CUSTOMER
 
-#bash
+bash
 
 exit
