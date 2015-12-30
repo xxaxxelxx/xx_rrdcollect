@@ -2,7 +2,6 @@
 LB_HOST=$1
 RRD_LOOP=$2
 CUSTOMER=$3
-FAILTIMEOUT=10
 test -z $LB_HOST && exit;
 test -z $RRD_LOOP && exit;
 test -z $CUSTOMER && exit;
@@ -39,14 +38,7 @@ if [ "x$CUSTOMER" == "xadmin" ]; then
     done
 else
     while true; do
-	A_MOUNTPOINTS=""; SLEEP=$(( $RRD_LOOP + $FAILTIMEOUT ))
-	while [ "x${A_MOUNTPOINTS[0]}" == "x" ]; do
-	    OIFS=$IFS; IFS=$'\n'; A_MOUNTPOINTS=($(curl --connect-timeout $FAILTIMEOUT --max-time $FAILTIMEOUT -s "http://$LB_HOST/listmountpointlisteners.php?mnt=$CUSTOMER")); IFS=$OIFS
-	    SLEEP=$(( $SLEEP - $FAILTIMEOUT ))
-	    if [ $SLEEP -le $FAILTIMEOUT ]; then break; fi
-	    sleep $FAILTIMEOUT
-	done
-	if [ "x${A_MOUNTPOINTS[0]}" == "x" ]; then continue; fi
+	OIFS=$IFS; IFS=$'\n'; A_MOUNTPOINTS=($(curl --connect-timeout 10 --max-time 10 -s "http://$LB_HOST/listmountpointlisteners.php?mnt=$CUSTOMER")); IFS=$OIFS
 	for LISTMNT in ${A_MOUNTPOINTS[@]}; do
 	    OIFS=$IFS; IFS=$'@'; A_ELEM=($(echo "$LISTMNT")); IFS=$OIFS
 	    LIST=${A_ELEM[0]}
@@ -71,7 +63,7 @@ else
 	    )
 	    rrdtool update $RRDFILE N:$C_VALUE
 	done
-	sleep $SLEEP
+	sleep $RRD_LOOP
     done
 #    while true; do
 #	OIFS=$IFS; IFS=$'\n'; A_MOUNTPOINTS=($(curl --connect-timeout 20 --max-time 30 -s "http://$LB_HOST/listmountpoints.php?mnt=$CUSTOMER")); IFS=$OIFS
