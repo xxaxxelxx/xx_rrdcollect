@@ -9,14 +9,6 @@ test -z $CUSTOMER && exit;
 
 if [ "x$CUSTOMER" == "xadmin" ]; then
     while true; do
-	A_MACHINES=""; SLEEP=$(( $RRD_LOOP + $FAILTIMEOUT ))
-	while [ "x${A_MACHINES[0]}" == "x" ]; do
-	    OIFS=$IFS; IFS=$'\n'; A_MACHINES=($(curl --connect-timeout $FAILTIMEOUT --max-time $FAILTIMEOUT -s "http://$LB_HOST/listmachines.php")); IFS=$OIFS
-	    SLEEP=$(( $SLEEP - $FAILTIMEOUT ))
-	    if [ $SLEEP -le $FAILTIMEOUT ]; then break; fi
-	    sleep $FAILTIMEOUT
-	done
-	if [ "x${A_MACHINES[0]}" == "x" ]; then continue; fi
 	OIFS=$IFS; IFS=$'\n'; A_MACHINES=($(curl --connect-timeout 20 --max-time 30 -s "http://$LB_HOST/listmachines.php")); IFS=$OIFS
 	for MACHINE in ${A_MACHINES[@]}; do
 	    OIFS=$IFS; IFS='|'; A_MACHINE_DATA=($(echo "$MACHINE")); IFS=$OIFS
