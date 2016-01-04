@@ -43,38 +43,7 @@ if [ "x$CUSTOMER" == "xadmin" ]; then
 	    )
 	    rrdtool update $RRDFILE N:$C_BW:$C_BWLOAD:$C_LOAD
 	done
-	ALL_RRDFILE="/customer/$CUSTOMER/_ALL.rrd"
-	test -f $ALL_RRDFILE || (
-		ITEMS_DAY=$(( $((2 * 24 * 60 * 60)) / $(( $RRD_LOOP * 1 )) ))
-		ITEMS_WEEK=$(( $((8 * 24 * 60 * 60)) / $(( $RRD_LOOP * 4 )) ))
-		ITEMS_MONTH=$(( $((36 * 24 * 60 * 60)) / $(( $RRD_LOOP * 12 )) ))
-		ITEMS_YEAR=$(( $((366 * 24 * 60 * 60)) / $(( $RRD_LOOP * 100 )) ))
-		rrdtool create $ALL_RRDFILE \
-		--step $RRD_LOOP \
-		DS:bw:GAUGE:$(($RRD_LOOP*2)):U:U \
-		DS:listeners:GAUGE:$(($RRD_LOOP*2)):U:U \
-		RRA:MAX:0.5:1:$ITEMS_DAY \
-		RRA:MAX:0.5:4:$ITEMS_WEEK \
-		RRA:MAX:0.5:12:$ITEMS_MONTH \
-		RRA:MAX:0.5:100:$ITEMS_YEAR
-	)
-###
-	A_SUM=""; SLEEP=$(( $SLEEP + $FAILTIMEOUT ))
-	while [ "x${A_SUM[0]}" == "x" ]; do
-	    OIFS=$IFS; IFS=$'\n'; A_SUM=($(curl --connect-timeout $FAILTIMEOUT --max-time $FAILTIMEOUT -s "http://$LB_HOST/sum_listeners_bw.php")); IFS=$OIFS
-	    SLEEP=$(( $SLEEP - $FAILTIMEOUT ))
-	    if [ $SLEEP -le $FAILTIMEOUT ]; then break; fi
-	    sleep $FAILTIMEOUT
-	done
-	if [ "x${A_SUM[0]}" == "x" ]; then continue; fi
-	for SUMELEM in ${A_SUM[@]}; do
-	    OIFS=$IFS; IFS='|'; A_SUM_DATA=($(echo "$SUMELEM")); IFS=$OIFS
-	    C_SUMBW=${A_SUM_DATA[0]}
-	    C_SUMLIST=${A_SUM_DATA[1]}
-	done
-	rrdtool update $ALL_RRDFILE N:$C_SUMBW:$C_SUMLIST
-###
-	sleep $SLEEP
+	sleep $RRD_LOOP
     done
 else
     while true; do
@@ -112,6 +81,30 @@ else
 	done
 	sleep $SLEEP
     done
+#    while true; do
+#	OIFS=$IFS; IFS=$'\n'; A_MOUNTPOINTS=($(curl --connect-timeout 20 --max-time 30 -s "http://$LB_HOST/listmountpoints.php?mnt=$CUSTOMER")); IFS=$OIFS
+#	for MNT in ${A_MOUNTPOINTS[@]}; do
+#	    STRIPPED_MNT=$(echo $MNT | sed 's|^/||')
+#	    C_VALUE=$(curl --connect-timeout 3 -s "http://$LB_HOST/listeners.php?mnt=$STRIPPED_MNT")
+#	    C_MNT=$(echo $MNT | sed 's|^/||' | sed 's|\.|\_|g')
+#	    RRDFILE="/customer/$CUSTOMER/_$C_MNT.rrd"
+#	    test -f $RRDFILE || (
+#		ITEMS_DAY=$(( $((2 * 24 * 60 * 60)) / $(( $RRD_LOOP * 1 )) ))
+#		ITEMS_WEEK=$(( $((8 * 24 * 60 * 60)) / $(( $RRD_LOOP * 4 )) ))
+#		ITEMS_MONTH=$(( $((36 * 24 * 60 * 60)) / $(( $RRD_LOOP * 12 )) ))
+#		ITEMS_YEAR=$(( $((366 * 24 * 60 * 60)) / $(( $RRD_LOOP * 100 )) ))
+#		rrdtool create $RRDFILE \
+#		--step $RRD_LOOP \
+#		DS:${C_MNT:0:19}:GAUGE:$(($RRD_LOOP*2)):U:U \
+#		RRA:MAX:0.5:1:$ITEMS_DAY \
+#		RRA:MAX:0.5:4:$ITEMS_WEEK \
+#		RRA:MAX:0.5:12:$ITEMS_MONTH \
+#		RRA:MAX:0.5:100:$ITEMS_YEAR
+#	    )
+#	    rrdtool update $RRDFILE N:$C_VALUE
+#	done
+#	sleep $RRD_LOOP
+#    done
 fi
 exit
 
