@@ -62,7 +62,7 @@ if [ "x$CUSTOMER" == "xadmin" ]; then
 		RRA:MAX:0.5:12:$ITEMS_MONTH \
 		RRA:MAX:0.5:100:$ITEMS_YEAR
 	)
-	A_SUM=""; SLEEP=$(( $SLEEP + $FAILTIMEOUT ))
+#	A_SUM=""; SLEEP=$(( $SLEEP + $FAILTIMEOUT ))
 #	while [ "x${A_SUM[0]}" == "x" ]; do
 #	    OIFS=$IFS; IFS=$'\n'; A_SUM=($(curl --connect-timeout $FAILTIMEOUT --max-time $FAILTIMEOUT -s "http://$LB_HOST/sum_listeners_bw.php")); IFS=$OIFS
 #	    SLEEP=$(( $SLEEP - $FAILTIMEOUT ))
@@ -71,9 +71,9 @@ if [ "x$CUSTOMER" == "xadmin" ]; then
 #	done
 #	if [ "x${A_SUM[0]}" == "x" ]; then continue; fi
 #	for SUMELEM in ${A_SUM[@]}; do
-#	    OIFS=$IFS; IFS='|'; A_SUM_DATA=($(echo "$SUMELEM")); IFS=$OIFS
-#	    C_SUMBW=${A_SUM_DATA[0]}
-#	    C_SUMLIST=${A_SUM_DATA[1]}
+#        OIFS=$IFS; IFS='|'; A_SUM_DATA=($(echo "$SUMELEM")); IFS=$OIFS
+#	    C_BW_SUM=${A_SUM_DATA[0]}
+#	    C_LIST_SUM=${A_SUM_DATA[1]}
 #	done
 	rrdtool update $ALL_RRDFILE N:$C_BW_SUM:$C_LIST_SUM
 	sleep $SLEEP
