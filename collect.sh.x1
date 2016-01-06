@@ -18,7 +18,6 @@ if [ "x$CUSTOMER" == "xadmin" ]; then
 	done
 	if [ "x${A_MACHINES[0]}" == "x" ]; then continue; fi
 #	OIFS=$IFS; IFS=$'\n'; A_MACHINES=($(curl --connect-timeout 20 --max-time 30 -s "http://$LB_HOST/listmachines.php")); IFS=$OIFS
-	C_LIST_SUM=0; C_BW_SUM=0
 	for MACHINE in ${A_MACHINES[@]}; do
 	    OIFS=$IFS; IFS='|'; A_MACHINE_DATA=($(echo "$MACHINE")); IFS=$OIFS
 	    IP=${A_MACHINE_DATA[0]}
@@ -26,8 +25,6 @@ if [ "x$CUSTOMER" == "xadmin" ]; then
 	    C_BW=${A_MACHINE_DATA[1]}
 	    C_BWLOAD=${A_MACHINE_DATA[2]}
 	    C_LOAD=${A_MACHINE_DATA[3]}
-	    C_LIST_SUM=$((${A_MACHINE_DATA[4]} + $C_LIST_SUM))
-	    C_BW_SUM=$(($C_BW + $C_BW_SUM))
 	    RRDFILE="/customer/$CUSTOMER/_$C_IP.rrd"
 	    test -f $RRDFILE || (
 		ITEMS_DAY=$(( $((2 * 24 * 60 * 60)) / $(( $RRD_LOOP * 1 )) ))
@@ -63,19 +60,20 @@ if [ "x$CUSTOMER" == "xadmin" ]; then
 		RRA:MAX:0.5:100:$ITEMS_YEAR
 	)
 	A_SUM=""; SLEEP=$(( $SLEEP + $FAILTIMEOUT ))
-#	while [ "x${A_SUM[0]}" == "x" ]; do
-#	    OIFS=$IFS; IFS=$'\n'; A_SUM=($(curl --connect-timeout $FAILTIMEOUT --max-time $FAILTIMEOUT -s "http://$LB_HOST/sum_listeners_bw.php")); IFS=$OIFS
-#	    SLEEP=$(( $SLEEP - $FAILTIMEOUT ))
-#	    if [ $SLEEP -le $FAILTIMEOUT ]; then break; fi
-#	    sleep $FAILTIMEOUT
-#	done
-#	if [ "x${A_SUM[0]}" == "x" ]; then continue; fi
-#	for SUMELEM in ${A_SUM[@]}; do
-#	    OIFS=$IFS; IFS='|'; A_SUM_DATA=($(echo "$SUMELEM")); IFS=$OIFS
-#	    C_SUMBW=${A_SUM_DATA[0]}
-#	    C_SUMLIST=${A_SUM_DATA[1]}
-#	done
-	rrdtool update $ALL_RRDFILE N:$C_BW_SUM:$C_LIST_SUM
+	while [ "x${A_SUM[0]}" == "x" ]; do
+	    OIFS=$IFS; IFS=$'\n'; A_SUM=($(curl --connect-timeout $FAILTIMEOUT --max-time $FAILTIMEOUT -s "http://$LB_HOST/sum_listeners_bw.php")); IFS=$OIFS
+	    SLEEP=$(( $SLEEP - $FAILTIMEOUT ))
+	    if [ $SLEEP -le $FAILTIMEOUT ]; then break; fi
+	    sleep $FAILTIMEOUT
+	done
+	if [ "x${A_SUM[0]}" == "x" ]; then continue; fi
+	for SUMELEM in ${A_SUM[@]}; do
+	    OIFS=$IFS; IFS='|'; A_SUM_DATA=($(echo "$SUMELEM")); IFS=$OIFS
+	    C_SUMBW=${A_SUM_DATA[0]}
+	    C_SUMLIST=${A_SUM_DATA[1]}
+	done
+	rrdtool update $ALL_RRDFILE N:$C_SUMBW:$C_SUMLIST
+
 	sleep $SLEEP
     done
 else
