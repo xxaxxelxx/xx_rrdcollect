@@ -30,10 +30,10 @@ if [ "x$CUSTOMER" == "xadmin" ]; then
 	    C_BW_SUM=$(($C_BW + $C_BW_SUM))
 	    RRDFILE="/customer/$CUSTOMER/_$C_IP.rrd"
 #
-test -f $RRDFILE.old
-if [ $? -ne 0 ]; then
-    mv $RRDFILE $RRDFILE.old
-fi 
+#test -f $RRDFILE.old
+#if [ $? -ne 0 ]; then
+#    mv $RRDFILE $RRDFILE.old
+#fi 
 #
 	    test -f $RRDFILE || (
 		ITEMS_DAY=$(( $((2 * 24 * 60 * 60)) / $(( $RRD_LOOP * 1 )) ))
