@@ -41,7 +41,6 @@ fi
 		ITEMS_MONTH=$(( $((36 * 24 * 60 * 60)) / $(( $RRD_LOOP * 12 )) ))
 		ITEMS_YEAR=$(( $((366 * 24 * 60 * 60)) / $(( $RRD_LOOP * 100 )) ))
 		rrdtool create $RRDFILE \
-		-r $RRDFILE.old \
 		--step $RRD_LOOP \
 		DS:bw:GAUGE:$(($RRD_LOOP*2)):U:U \
 		DS:bwlimit:GAUGE:$(($RRD_LOOP*2)):U:U \
