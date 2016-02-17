@@ -1,4 +1,4 @@
-# ***RRDCOLLECT***
+# ***RRDCOLLECT***	b	
 # Collects statistics and drops them into RRD databases
 # Part of Dockerized Distributed Streaming System
 
@@ -30,7 +30,7 @@ It collects statistical data from the (local) load balancer and writes them into
 
 ### Example
 ```bash
-$ docker run -d --name rrdgraph_CUSTOMER --volumes-from customerweb -e LOOP=300 -e GROUPMARKER=MARKER1|MARKER2|MARKERN --restart=always xxaxxelxx/xx_rrdgraph CUSTOMER
+$ docker run -d --name rrdcollect_CUSTOMER --volumes-from customerweb --link loadbalancer:loadbalancer -e RRD_LOOP=300 --restart=always xxaxxelxx/xx_rrdcollect CUSTOMER
 ```
 ***
 
